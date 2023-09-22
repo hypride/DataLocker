@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Realtime Database Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 500px;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    #result {
+      font-weight: bold;
+    }
+  </style>
+  <!-- Include Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+
+<!-- Firebase Configuration -->
+<script>
+ // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+var firebaseConfig = {
+  apiKey: "AIzaSyBUzxJ1OSVHWkhDtadpZiqBrnRFvaeltMI",
+  authDomain: "crypt-e4a5b.firebaseapp.com",
+  databaseURL: "https://crypt-e4a5b-default-rtdb.firebaseio.com",
+  projectId: "crypt-e4a5b",
+  storageBucket: "crypt-e4a5b.appspot.com",
+  messagingSenderId: "1021257746327",
+  appId: "1:1021257746327:web:c8f7517893a063c3e526d2",
+  measurementId: "G-B0SSP490GF"
+};
+
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<div class="container" id="container1">
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+  <h1>Free Data Locker....</h1>
+  <p>Developed By <b>Nazim</b></p>
+  </div>
+  <!-- HTML Form to Send and Retrieve Data -->
+  <form id="data-form">
+    <input type="text" style="width: 85%;" id="custom-key1" placeholder="Custom Key">
+    <textarea type="text" style="height: 100px; resize: none; padding: 10px; width: 85%; margin-bottom: 20px;" id="data-value" placeholder="Data Value"></textarea>
+    <button type="button" onclick="writeData()">Submit</button>
+    <button type="button" onclick="disfun()">Read Data</button>
+  </form>
+</div>
+
+<div class="container" id="container2" style="display: none;">
+  <h1>Read the Data</h1>
+  <form id="read-data-form">
+    <input type="text" style="width: 80%;" id="custom-key2" placeholder="Custom Key">
+    <button type="button" onclick="readData()">Read Data</button>
+  </form>
+  <h2>Read Data:</h2>
+  <div id="result"></div>
+</div>
+
+<script>
+  // Function to send data to Firebase with a custom key
+  function writeData() {
+    var customKey = document.getElementById("custom-key1").value;
+    var dataValue = document.getElementById("data-value").value;
+
+    if (customKey && dataValue) {
+      var database = firebase.database();
+      var keyRef = database.ref(customKey);
+
+      // Check if the key already exists
+      keyRef.once('value', function(snapshot) {
+        if (snapshot.exists()) {
+          alert("Key already exists in Firebase. Try a different key.");
+        } else {
+          // Key doesn't exist, write the data
+          database.ref(customKey).set(dataValue)
+            .then(function () {
+              alert("Data successfully written!");
+            })
+            .catch(function (error) {
+              alert("Error writing data: " + error);
+            });
+        }
+      });
+    } else {
+      alert("Custom Key and Data Value are required.");
+    }
+  }
+
+  // Function to retrieve data from Firebase using a fixed key
+  function readData() {
+    var customKey = document.getElementById("custom-key2").value;
+    var resultDiv = document.getElementById("result");
+
+    if (customKey) {
+      console.log("Reading data for key: " + customKey);
+
+      var database = firebase.database();
+      database.ref(customKey).once('value')
+        .then(function (snapshot) {
+          var data = snapshot.val();
+          if (data !== null) {
+            resultDiv.innerHTML = "Data: " + data;
+          } else {
+            resultDiv.innerHTML = "No data found for the specified key.";
+          }
+        })
+        .catch(function (error) {
+          alert("Error reading data: " + error.message);
+        });
+    } else {
+      alert("Custom Key is required.");
+    }
+  }
+
+  // Function to switch to the read data container
+  function disfun() {
+    document.getElementById("container1").style.display = "none";
+    document.getElementById("container2").style.display = "block";
+  }
+</script>
+</body>
+</html>
